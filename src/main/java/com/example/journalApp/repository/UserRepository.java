@@ -1,0 +1,14 @@
+package com.example.journalApp.repository;
+import com.example.journalApp.entity.User;
+import lombok.NonNull;
+import org.bson.types.ObjectId;
+import org.springframework.boot.webmvc.autoconfigure.WebMvcProperties;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+public interface UserRepository extends MongoRepository<User, ObjectId> {
+    // This interface will automatically inherit methods for CRUD operations from MongoRepository.
+    // You can also define custom query methods here if needed.
+    User findByUserName(String userName);
+
+    void deleteByUserName(@NonNull String userName);
+}
