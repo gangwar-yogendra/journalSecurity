@@ -1,6 +1,8 @@
 spring:
   mongodb:
-    uri: ${MONGODB_URI} # This Env variable is set in ~/.bashrc
+    uri: mongodb+srv://<UserName>:<Password>@cluster0.hhfoyy6.mongodb.net/journaldb?retryWrites=true&w=majority&appName=Cluster0
+    #uri: ${MONGODB_URI} # This Env variable is set in ~/.bashrc
+
 
   data:
     mongodb:

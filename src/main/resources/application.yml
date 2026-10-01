@@ -2,8 +2,21 @@ spring:
   profiles:
     active: dev
 
+  mail:
+    host: ${MAIL_HOST} # This Env variable is set in ~/.bashrc
+    port: ${MAIL_PORT} # This Env variable is set in ~/.bashrc
+    username: ${MAIL_USERNAME} # This Env variable is set in ~/.bashrc
+    password: ${MAIL_PASSWORD} # This Env variable is set in ~/.bashrc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 weather:
   api:
     key: ${WEATHER_API_KEY} # This Env variable is set in ~/.bashrc
     #We have commented because we are now storing the API URL in the database and using AppCache to retrieve it
     # url: "http://api.weatherstack.com/current?access_key={apiKey}&query={city}"
+
