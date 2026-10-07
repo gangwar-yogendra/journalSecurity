@@ -1,7 +1,7 @@
 package com.example.journalApp.service;
 
 import com.example.journalApp.entity.JournalEntry;
-import com.example.journalApp.entity.User;
+import com.example.journalApp.entity.UserEntity;
 import com.mongodb.DBRef;
 import com.example.journalApp.repository.JournalEntryRepository;
 import org.bson.types.ObjectId;
@@ -41,16 +41,17 @@ public class JournalEntryService {
 
     private static final Logger logger = LoggerFactory.getLogger(JournalEntryService.class);
 
-    // This method saves a journal entry to the database using the repository.
-    // User of @Transaction process complete else will not do any operation in the given function
+
+    // UserEntity of @Transaction process complete else will not do any operation in the given function
     // to store the data in collection of mongodb
     @Transactional
+    // This method saves a journal entry to the database using the repository.
     public void saveEntry(JournalEntry entry, String userName) {
         if (userName == null || userName.isBlank()) {
             logger.error("userName must not be blank");
             throw new IllegalArgumentException("userName must not be blank");
         }
-        User user = userService.findByUserName(userName);
+        UserEntity user = userService.findByUserName(userName);
         if (user == null) {
             logger.error("User not found: {}", userName);
             throw new IllegalArgumentException("User not found: " + userName);
@@ -60,12 +61,12 @@ public class JournalEntryService {
         logger.info("Saving journal entry for user: {}", userName);
         JournalEntry saved = journalEntryRepository.save(entry);
 
-        // This code section is updating the journalEntry field of the User entity with the newly created journal entry.
+        // This code section is updating the journalEntry field of the UserEntity entity with the newly created journal entry.
         user.getJournalEntries().add(saved);
         userService.saveEntry(user);
     }
 
-    // Get all database entries
+    // Get all database entries from journalEntries
     public List<JournalEntry> getAllEntries()
     {
         return journalEntryRepository.findAll();
@@ -85,7 +86,7 @@ public class JournalEntryService {
         }
 
         try {
-            User user = userService.findByUserName(userName);
+            UserEntity user = userService.findByUserName(userName);
             if (user == null) {
                 return false;
             }
@@ -98,7 +99,7 @@ public class JournalEntryService {
                 Update update = new Update()
                         .pull("relatedEntries", new DBRef("journal_entries", id))
                         .pull("journalEntries", new DBRef("journal_entries", id));
-                removedFromUser = mongoTemplate.updateFirst(query, update, User.class).getModifiedCount() > 0;
+                removedFromUser = mongoTemplate.updateFirst(query, update, UserEntity.class).getModifiedCount() > 0;
             }
             if (!removedFromUser) {
                 return false;

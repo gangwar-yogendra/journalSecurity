@@ -1,11 +1,15 @@
 package com.example.journalApp.repository;
-import com.example.journalApp.entity.User;
+import com.example.journalApp.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserRepositoryImpl{
     @Autowired
@@ -15,7 +19,7 @@ public class UserRepositoryImpl{
     // You can also define custom query methods here if needed.
 
     // Criteria and Query
-    public List<User> getUserForSentimentAnalysis()
+    public List<UserEntity> getUserForSentimentAnalysis()
     {
         Query query = new Query();
         //query.addCriteria(Criteria.where("name").is("Yogi"));
@@ -45,15 +49,27 @@ public class UserRepositoryImpl{
                 Criteria.where("sentimentalAnalysisEnabled").is(true)
         ));*/
 
-        return mongoTemplate.find(query, User.class);
+        return mongoTemplate.find(query, UserEntity.class);
     }
 
-    public List<User> getUserForSentimentAnalysisForUserName()
+    public List<UserEntity> getUserForSentimentAnalysisForUserName()
     {
         Query query = new Query();
 
         query.addCriteria(Criteria.where("name").is("Yogi"));
 
-        return mongoTemplate.find(query, User.class);
+        return mongoTemplate.find(query, UserEntity.class);
+    }
+
+    public List<UserEntity> findUsersWhoHaveNotWrittenJournalForTheDay() {
+        Date startOfDay = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date startOfTomorrow = Date.from(LocalDate.now().plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        return getUserForSentimentAnalysis().stream()
+                .filter(user -> user.getJournalEntries() == null || user.getJournalEntries().stream()
+                        .noneMatch(entry -> entry.getDate() != null
+                                && !entry.getDate().before(startOfDay)
+                                && entry.getDate().before(startOfTomorrow)))
+                .collect(Collectors.toList());
     }
 }

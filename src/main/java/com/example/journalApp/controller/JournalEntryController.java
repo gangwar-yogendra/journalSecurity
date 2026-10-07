@@ -1,7 +1,7 @@
 package com.example.journalApp.controller;
 
 import com.example.journalApp.entity.JournalEntry;
-import com.example.journalApp.entity.User;
+import com.example.journalApp.entity.UserEntity;
 import com.example.journalApp.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ public class JournalEntryController {
         String userName = authentication.getName();
 
         // Logic to retrieve all journal entries of a specific user from the database
-        User user = userService.findByUserName(userName);
+        UserEntity user = userService.findByUserName(userName);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -80,7 +80,7 @@ public class JournalEntryController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
 
-        User user = userService.findByUserName(userName); // Ensure the user exists, otherwise return NOT_FOUND
+        UserEntity user = userService.findByUserName(userName); // Ensure the user exists, otherwise return NOT_FOUND
 
         // Finding the journal entry id in user journal entry id list
         List<JournalEntry> journalEntries = user.getJournalEntries().stream()
@@ -119,7 +119,7 @@ public class JournalEntryController {
     public ResponseEntity<?> updateEntry(@PathVariable ObjectId id, @RequestBody JournalEntry updatedEntry) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
-        User user = userService.findByUserName(userName); // Ensure the user exists, otherwise return NOT_FOUND
+        UserEntity user = userService.findByUserName(userName); // Ensure the user exists, otherwise return NOT_FOUND
 
         // Finding the journal entry id in user journal entry id list
         List<JournalEntry> journalEntries = user.getJournalEntries().stream()

@@ -1,6 +1,6 @@
 package com.example.journalApp.service;
 
-import com.example.journalApp.entity.User;
+import com.example.journalApp.entity.UserEntity;
 import com.example.journalApp.repository.UserRepository;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
@@ -18,37 +18,39 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // This method saves a user to the database using the repository.
     // This function is used to save user with encrypted password
-    public void saveNewUser(User user) {
+    public void saveNewUser(UserEntity user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(List.of("USER")); // Set default role to USER
         userRepository.save(user);
     }
 
     // This business logic to add a new user in database as ADMIN
-    public void saveNewAdminUser(User user) {
+    public void saveNewAdminUser(UserEntity user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(List.of("USER", "ADMIN")); // Set role to ADMIN
         userRepository.save(user);
     }
 
     // Save user details in db
-    public void saveEntry(User user) {
+    public void saveEntry(UserEntity user) {
         userRepository.save(user);
     }
 
     // Get all database entries
-    public List<User> getAllEntries()
+    public List<UserEntity> getAllEntries()
     {
         return userRepository.findAll();
     }
 
     // Get user details using db object id
-    public Optional<User> getEntryById(ObjectId id) {
+    public Optional<UserEntity> getEntryById(ObjectId id) {
         return userRepository.findById(id);
     }
 
@@ -59,14 +61,14 @@ public class UserService {
 
 
     // Updated user in database
-    public void updateEntry(User user) {
+    public void updateEntry(UserEntity user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(List.of("USER")); // Set default role to USER
         userRepository.save(user);
     }
 
     // Find user details by username
-    public User findByUserName(String userName) {
+    public UserEntity findByUserName(String userName) {
         return userRepository.findByUserName(userName);
     }
 

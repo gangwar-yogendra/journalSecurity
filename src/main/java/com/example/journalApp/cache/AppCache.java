@@ -27,6 +27,16 @@ public class AppCache {
     private ConfigJournalAppRepository configJournalAppRepository;
 
     // We will get the key and value here from "config_journal_app" collection from MongoDB
+    // @PostConstruct annotation is used in Spring/Java to run a method automatically after
+    // a bean has been created and its dependencies have been injected, but before the bean is used by the application
+    // The typical lifecycle is:
+    //    Spring creates object
+    //       ↓
+    //    Dependencies are injected
+    //       ↓
+    //    @PostConstruct method runs
+    //       ↓
+    //    Bean is ready to use
     @PostConstruct
     public void init()
     {

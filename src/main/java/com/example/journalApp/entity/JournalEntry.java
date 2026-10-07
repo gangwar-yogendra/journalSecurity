@@ -1,6 +1,7 @@
 package com.example.journalApp.entity;
 
 
+import com.example.journalApp.enums.Sentiment;
 import lombok.*;
 import org.bson.types.ObjectId;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -31,4 +32,10 @@ public class JournalEntry {
     private String title;
     private String content;
     private Date date;
+
+    // The sentiment of the journal entry
+    // And since we have updated the Sentimental a new field
+    // then we need to update the database also using with this new filed
+    // to test
+    private Sentiment sentiment;
 }

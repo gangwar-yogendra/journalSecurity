@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -11,6 +12,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 // To enable the @Transactional annotation for managing transactions in the application,
 // we use @EnableTransactionManagement.
 @EnableTransactionManagement
+// To enable the scheduling for cron job
+@EnableScheduling
 public class journalMongoSecurityApplication {
 
 	public static void main(String[] args) {

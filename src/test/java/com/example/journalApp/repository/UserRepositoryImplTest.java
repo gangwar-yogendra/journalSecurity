@@ -1,6 +1,6 @@
 package com.example.journalApp.repository;
 
-import com.example.journalApp.entity.User;
+import com.example.journalApp.entity.UserEntity;
 import com.example.journalApp.repository.UserRepositoryImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,18 +36,18 @@ class UserRepositoryImplTest {
     void getUserForSentimentAnalysis_shouldReturnUsersWithNameYogi() {
 
         // Arrange
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setUserName("Yogi");
 
-        List<User> expectedUsers = List.of(user);
+        List<UserEntity> expectedUsers = List.of(user);
 
         when(mongoTemplate.find(
                 any(Query.class),
-                eq(User.class)
+                eq(UserEntity.class)
         )).thenReturn(expectedUsers);
 
         // Act
-        List<User> actualUsers =
+        List<UserEntity> actualUsers =
                 userRepository.getUserForSentimentAnalysisForUserName();
 
         // Assert
@@ -59,7 +59,7 @@ class UserRepositoryImplTest {
 
         verify(mongoTemplate).find(
                 queryCaptor.capture(),
-                eq(User.class)
+                eq(UserEntity.class)
         );
 
         Query capturedQuery = queryCaptor.getValue();
@@ -71,20 +71,20 @@ class UserRepositoryImplTest {
     void getUserForSentimentAnalysis_shouldReturnUsersWithValidEmailAndSentimentAnalysisEnabled() {
 
         // Arrange
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setUserName("Ram");
         user.setEmail("ram_test@gmail.com");
         user.setSentimentalAnalysisEnabled(true);
 
-        List<User> expectedUsers = List.of(user);
+        List<UserEntity> expectedUsers = List.of(user);
 
         when(mongoTemplate.find(
                 any(Query.class),
-                eq(User.class)
+                eq(UserEntity.class)
         )).thenReturn(expectedUsers);
 
         // Act
-        List<User> actualUsers =
+        List<UserEntity> actualUsers =
                 userRepository.getUserForSentimentAnalysis();
 
         // Assert - returned users
@@ -96,7 +96,7 @@ class UserRepositoryImplTest {
 
         verify(mongoTemplate).find(
                 queryCaptor.capture(),
-                eq(User.class)
+                eq(UserEntity.class)
         );
 
         Query capturedQuery = queryCaptor.getValue();

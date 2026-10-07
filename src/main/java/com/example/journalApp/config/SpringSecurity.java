@@ -33,6 +33,7 @@ public class SpringSecurity {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/users/register").permitAll()
                         .requestMatchers("/admin/create-admin").permitAll()
                         .requestMatchers("/journal/**", "/users/**").authenticated()
                         .requestMatchers("/admin/**").hasRole("ADMIN")

@@ -2,7 +2,7 @@ package com.example.journalApp.controller;
 
 
 import com.example.journalApp.cache.AppCache;
-import com.example.journalApp.entity.User;
+import com.example.journalApp.entity.UserEntity;
 import com.example.journalApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ public class AdminController {
     @GetMapping("/all-users")
     public ResponseEntity<?> getAllUsers()
     {
-        List<User> users = userService.getAllEntries();
+        List<UserEntity> users = userService.getAllEntries();
 
         if(users != null && !users.isEmpty()) {
             // Do something with the users
@@ -34,8 +34,8 @@ public class AdminController {
     }
 
     @PostMapping("/create-admin")
-    //public ResponseEntity<?> createAdminUser(User user)
-    public ResponseEntity<?> createAdminUser(@RequestBody User user)
+    //public ResponseEntity<?> createAdminUser(UserEntity user)
+    public ResponseEntity<?> createAdminUser(@RequestBody UserEntity user)
     {
         // Password will save in encrypted format
         userService.saveNewAdminUser(user);

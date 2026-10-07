@@ -1,6 +1,6 @@
 package com.example.journalApp.controller;
 import com.example.journalApp.api.response.WeatherResponse;
-import com.example.journalApp.entity.User;
+import com.example.journalApp.entity.UserEntity;
 import com.example.journalApp.service.UserService;
 import com.example.journalApp.service.WeatherService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,14 +24,20 @@ public class UserController {
     @Autowired
     private WeatherService weatherService;
 
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody UserEntity user) {
+        userService.saveNewUser(user);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
     // Update
     @PutMapping("/update")
-    public ResponseEntity<?> updateUser(@RequestBody User user) {
+    public ResponseEntity<?> updateUser(@RequestBody UserEntity user) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
 
-        User userIndb = userService.findByUserName(userName);
+        UserEntity userIndb = userService.findByUserName(userName);
         if(userIndb != null)
         {
             userIndb.setUserName(user.getUserName());
@@ -47,7 +53,7 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userName = authentication.getName();
 
-        User userIndb = userService.findByUserName(userName);
+        UserEntity userIndb = userService.findByUserName(userName);
         if(userIndb != null)
         {
             userService.deleteByUserName(userIndb.getUserName());
@@ -64,7 +70,7 @@ public class UserController {
 
         log.info("Authenticated user: {}", userName);
 
-        User userIndb = userService.findByUserName(userName);
+        UserEntity userIndb = userService.findByUserName(userName);
 
         log.info("User found in database: {}", userIndb != null ? userIndb.getUserName() : "null");
 

@@ -1,6 +1,6 @@
 package com.example.journalApp.service;
 
-import com.example.journalApp.entity.User;
+import com.example.journalApp.entity.UserEntity;
 import com.example.journalApp.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,11 +23,11 @@ public class UserServiceTest {
 
     @Test
     public void testFindByUserName() {
-        User expectedUser = new User();
+        UserEntity expectedUser = new UserEntity();
         expectedUser.setUserName("testUser");
         when(userRepository.findByUserName("testUser")).thenReturn(expectedUser);
 
-        User actualUser = userService.findByUserName("testUser");
+        UserEntity actualUser = userService.findByUserName("testUser");
 
         assertEquals(expectedUser, actualUser);
         verify(userRepository).findByUserName("testUser");
