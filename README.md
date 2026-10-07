@@ -9,6 +9,9 @@ A Spring Boot application for user registration, secure authentication, and jour
 - Journal creation tied to the authenticated user
 - MongoDB-backed user and journal storage
 - Sentiment-aware journal workflow
+- Weather lookup for authenticated users
+- Admin tools for user management and cache refresh
+- Scheduler-driven sentiment email reporting
 
 ## Tech Stack
 
@@ -94,6 +97,60 @@ Request body:
 }
 ```
 
+### 3) Admin endpoints
+
+The admin controller is used for user administration and cache refresh.
+
+- `GET /api/v1/admin/all-users` - list all users
+- `POST /api/v1/admin/create-admin` - create an admin user
+- `GET /api/v1/admin/clear-api-cache` - refresh the cached configuration values
+
+### 4) User profile endpoint
+
+The `/api/v1/users` endpoint returns a weather-based greeting for the authenticated user.
+
+```http
+GET http://localhost:8080/api/v1/users
+```
+
+It calls `WeatherService`, which uses `AppCache` to fetch the weather API URL and `WeatherResponse` to parse the external API response.
+
+## WeatherResponse and AppCache
+
+`WeatherResponse` is the POJO used to map the external weather API JSON into Java objects. It extracts the weather description and other fields returned by the API.
+
+`AppCache` loads configuration values from MongoDB on startup and keeps them in memory. The weather API URL is stored in the `config_journal_app` collection and fetched through:
+
+```java
+appCache.getValue(AppCache.keys.WEATHER_API.name());
+```
+
+This keeps the weather URL out of the service code and makes it easy to update without redeploying.
+
+## Sentiment and Scheduler
+
+Each journal entry can store a `Sentiment` value such as:
+
+- `HAPPY`
+- `SAD`
+- `ANGRY`
+- `ANXIOUS`
+
+The scheduler uses this data to analyze recent journal entries and send a weekly sentiment email.
+
+### Scheduler flow
+
+`UserScheduler.fetchUserAndSendSentimentalAnalysisEmail()`:
+
+1. Loads users from the repository
+2. Filters journal entries from the last 7 days
+3. Counts the most frequent sentiment
+4. Sends an email to the user with the result
+
+There is also a cache refresh job:
+
+`UserScheduler.clearAppCache()` reinitializes the in-memory cache from MongoDB.
+
 ## Authentication Flow
 
 The request flow works like this:
@@ -154,6 +211,32 @@ Then the new journal entry is saved and linked to the user through:
 user.getJournalEntries().add(saved);
 ```
 
+## Scheduler Flow
+
+```text
+UserScheduler
+  |
+  | fetchUserAndSendSentimentalAnalysisEmail()
+  v
+UserRepositoryImpl
+  |
+  | users with email + sentiment enabled
+  v
+Recent journal entries
+  |
+  | last 7 days only
+  v
+Sentiment counts
+  |
+  | most frequent value
+  v
+EmailService
+  |
+  | sendEmail(...)
+  v
+User receives report
+```
+
 ## Password Security
 
 Spring Security verifies the incoming password by comparing it with the stored BCrypt hash:
@@ -175,6 +258,8 @@ This means the application validates the raw password against the hashed databas
 - `UserDetailsServiceImpl` is the component responsible for loading the user from MongoDB during authentication.
 - `UserEntity` represents the stored user record in the database.
 - The current implementation uses the authenticated username to fetch the correct user before saving journal data.
+- `WeatherResponse` and `AppCache` power the weather greeting endpoint.
+- `UserScheduler` drives the weekly sentiment report and cache refresh.
 
 ## Example Usage
 

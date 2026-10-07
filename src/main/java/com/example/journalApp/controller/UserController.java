@@ -26,25 +26,71 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserEntity user) {
-        userService.saveNewUser(user);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        log.info("Register request received for username: {}", user.getUserName());
+
+        try {
+            userService.saveNewUser(user);
+
+            log.info("User registered successfully: {}", user.getUserName());
+
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body("User registered successfully");
+
+        } catch (IllegalArgumentException e) {
+
+            log.warn("Registration failed: {}", e.getMessage());
+
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(e.getMessage());
+        }
     }
 
     // Update
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(@RequestBody UserEntity user) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userName = authentication.getName();
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
-        UserEntity userIndb = userService.findByUserName(userName);
-        if(userIndb != null)
-        {
-            userIndb.setUserName(user.getUserName());
-            userIndb.setPassword(user.getPassword());
-            userService.updateEntry(userIndb);
+        String currentUserName = authentication.getName();
+
+        try {
+            UserEntity existingUser =
+                    userService.findByUserName(currentUserName);
+
+            if (existingUser == null) {
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("User not found");
+            }
+
+            existingUser.setEmail(user.getEmail());
+            existingUser.setSentimentalAnalysisEnabled(
+                    user.isSentimentalAnalysisEnabled()
+            );
+
+            if (user.getPassword() != null &&
+                    !user.getPassword().isBlank()) {
+
+                existingUser.setPassword(user.getPassword());
+            }
+
+            userService.updateEntry(existingUser);
+
+            log.info("User updated successfully: {}", currentUserName);
+
+            return ResponseEntity.ok("User updated successfully");
+
+        } catch (IllegalArgumentException e) {
+
+            log.warn("User update failed: {}", e.getMessage());
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
         }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     // Delete

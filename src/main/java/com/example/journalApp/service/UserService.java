@@ -26,6 +26,11 @@ public class UserService {
     // This method saves a user to the database using the repository.
     // This function is used to save user with encrypted password
     public void saveNewUser(UserEntity user) {
+        if (userRepository.findByUserName(user.getUserName()) != null) {
+            throw new IllegalArgumentException(
+                    "User already exists with username: " + user.getUserName()
+            );
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(List.of("USER")); // Set default role to USER
         userRepository.save(user);
@@ -33,6 +38,13 @@ public class UserService {
 
     // This business logic to add a new user in database as ADMIN
     public void saveNewAdminUser(UserEntity user) {
+
+        if (userRepository.findByUserName(user.getUserName()) != null) {
+            throw new IllegalArgumentException(
+                    "User already exists with username: " + user.getUserName()
+            );
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(List.of("USER", "ADMIN")); // Set role to ADMIN
         userRepository.save(user);
@@ -62,9 +74,33 @@ public class UserService {
 
     // Updated user in database
     public void updateEntry(UserEntity user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        /*user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(List.of("USER")); // Set default role to USER
-        userRepository.save(user);
+        userRepository.save(user);*/
+
+        if (user.getId() == null) {
+            throw new IllegalArgumentException("User ID is required");
+        }
+
+        UserEntity existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() ->
+                        new IllegalArgumentException("User not found")
+                );
+
+        existingUser.setEmail(user.getEmail());
+        existingUser.setSentimentalAnalysisEnabled(
+                user.isSentimentalAnalysisEnabled()
+        );
+
+        if (user.getPassword() != null &&
+                !user.getPassword().isBlank()) {
+
+            existingUser.setPassword(
+                    passwordEncoder.encode(user.getPassword())
+            );
+        }
+
+        userRepository.save(existingUser);
     }
 
     // Find user details by username

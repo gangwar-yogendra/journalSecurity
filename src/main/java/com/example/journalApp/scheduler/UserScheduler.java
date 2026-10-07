@@ -30,7 +30,7 @@ public class UserScheduler {
     private AppCache appCache;
 
     // Fetch user for a cron job and send mail to those users who have not written their journal for the da
-    @Scheduled(cron = "0 0 9 * * SUN") // Adjust the cron expression as needed for Every Sunday at 9 AM
+    //@Scheduled(cron = "0 0 9 * * SUN") // Adjust the cron expression as needed for Every Sunday at 9 AM
     //@Scheduled(cron = "0 * * ? * *") // Adjust the cron expression as needed for testing (every minute)
     public void fetchUserAndSendSentimentalAnalysisEmail()
     {
